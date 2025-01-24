@@ -1,4 +1,4 @@
-namespace invoice_system.Utils.DTOs;
+namespace invoice_system.Utils.Helpers.ResHelpers;
 
 public class ApiResponse<T>{
     public bool? success {get; set;} = false;
