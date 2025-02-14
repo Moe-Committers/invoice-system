@@ -32,7 +32,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
             throw new BadRequestExceptions("email already exist");
         }
 
-        var DefaultRole = await _db.Roles.FirstOrDefaultAsync(r => r.Name == "User", ct);
+        var DefaultRole = await _db.Roles.FirstOrDefaultAsync(r => r.Name == "Staff", ct);
 
         var user = new Users
         {
@@ -42,6 +42,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
             Status = Status.isActive,
             RoleId = DefaultRole.Id,
             Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
+            PhoneNumber = request.PhoneNumber,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -67,12 +68,15 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
         _db.RefreshTokens.Add(refreshToken);
         await _db.SaveChangesAsync();
 
+        var userDto = user.Adapt<UserDto>();
+        userDto.Role = user.Role.Name ?? "Unknown";
+
         return new AuthResponse
         {
             AccessToken = accessToken,
             RefreshToken = refreshToken.Token,
             ExpiresIn = DateTime.UtcNow.AddDays(10),
-            User = user.Adapt<UserDto>()
+            User = userDto
         };
     }
 

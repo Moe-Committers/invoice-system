@@ -15,10 +15,10 @@ public class Users : BaseEntity{
     public int Age {get; set;}
     [MaxLength(9)]
     public int PhoneNumber {get; set;}
-    public string Avatar {get; set;}
+    public string? Avatar {get; set;}
     public long RoleId {get; set;}
     public string Password {get; set;}
-    public DateTime LastLogin {get; set;}
+    public DateTime? LastLogin {get; set;}
     public Status Status {get; set;}
     public virtual Roles Role {get; set;}
     public virtual ICollection<Invoices> Invoices {get; set;}

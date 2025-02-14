@@ -1,9 +1,10 @@
 using System.Text.Json.Serialization;
+using invoice_system.Features.Customers.Commands.Create;
 using MediatR;
 
 namespace invoice_system.Features.Customers.Commands.Update;
 
-public record UpdateCommand : IRequest<Models.Customers>
+public record UpdateCommand : IRequest<ActionCustomer>
 {
     [JsonIgnore]
     public long CustomerId { get; set; }

@@ -18,11 +18,21 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, UserDto>
 
     public async Task<UserDto> Handle(GetUserQuery request, CancellationToken ct)
     {
-        var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == request.UserId, ct);
+        var user = await _db.Users.Select(u => new UserDto
+        {
+            Id = u.Id,
+            Name = u.Name,
+            Email = u.Email,
+            Age = u.Age,
+            Role = u.Role.Name,
+            Status = u.Status,
+            CreatedAt = u.CreatedAt,
+            Avatar = u.Avatar
+        }).FirstOrDefaultAsync(u => u.Id == request.UserId, ct);
         if (user == null)
         {
             throw new NotFoundExceptions("user not found");
         }
-        return user.Adapt<UserDto>();
+        return user;
     }
 }

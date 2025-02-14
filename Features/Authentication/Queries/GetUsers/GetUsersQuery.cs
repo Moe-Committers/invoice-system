@@ -9,7 +9,7 @@ public record GetUsersQuery : IRequest<ApiResponse<List<UserDto>>> {
     public long? Id {get; set;}
     public DateTime? FromDate {get; set;}
     public DateTime? ToDate {get; set;}
-    public string? sort {get; set;} = "created";
+    public string? Sort {get; set;} = "created";
     public bool IsAscending {get; set;} = false;
     public int Page {get; init; } = 1;
     public int PageSize {get; init;} = 10;

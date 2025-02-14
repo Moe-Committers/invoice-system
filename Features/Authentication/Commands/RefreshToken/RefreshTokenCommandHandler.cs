@@ -55,12 +55,15 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, A
         _db.RefreshTokens.Add(newRefreshToken);
         await _db.SaveChangesAsync(ct);
 
+        var userDto = token.user.Adapt<UserDto>();
+        userDto.Role = token.user.Role.Name ?? "Unknown";
+
         return new AuthResponse
         {
             AccessToken = accessToken,
             RefreshToken = newRefreshToken.Token,
             ExpiresIn = DateTime.UtcNow.AddDays(10),
-            User = token.user.Adapt<UserDto>()
+            User = userDto
         };
     }
 

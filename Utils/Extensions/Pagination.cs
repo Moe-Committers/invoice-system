@@ -6,8 +6,8 @@ namespace invoice_system.Utils.Extensions;
 
 public static class Paginations
 {
-    public static async Task<ApiResponse<List<T>>> UsePaginate<T, TSource>(
-        this IQueryable<TSource> query,
+    public static async Task<ApiResponse<List<T>>> UsePaginate<T>(
+        this IQueryable<T> query,
         int pageNumber,
         int pageSize,
         CancellationToken ct = default
@@ -19,7 +19,7 @@ public static class Paginations
             .Take(pageSize)
             .ToListAsync(ct);
 
-        return ResHelper.Success(items.Adapt<List<T>>(), new PaginateResponse
+        return ResHelper.Success(items, new PaginateResponse
         {
             totalcounts = totalCount,
             page = pageNumber,

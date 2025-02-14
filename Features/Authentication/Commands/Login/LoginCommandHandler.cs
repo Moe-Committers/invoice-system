@@ -27,7 +27,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResponse>
 
     public async Task<AuthResponse> Handle(LoginCommand request, CancellationToken ct)
     {
-        var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == request.Email, ct);
+        var user = await _db.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Email == request.Email, ct);
 
         if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
         {
@@ -61,12 +61,15 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResponse>
         _db.RefreshTokens.Add(refreshToken);
         await _db.SaveChangesAsync();
 
+        var userDto = user.Adapt<UserDto>();
+        userDto.Role = user.Role.Name ?? "Unknown";
+
         return new AuthResponse
         {
             AccessToken = accessToken,
             RefreshToken = refreshToken.Token,
             ExpiresIn = DateTime.UtcNow.AddDays(10),
-            User = user.Adapt<UserDto>()
+            User = userDto
         };
     }
 
@@ -83,7 +86,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResponse>
         var claims = new List<Claim>{
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Role, userRole.Name.ToString()),
+            new Claim(ClaimTypes.Role, userRole.Name),
             new Claim("status", user.Status.ToString())
         };
 

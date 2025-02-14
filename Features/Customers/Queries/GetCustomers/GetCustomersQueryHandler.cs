@@ -19,6 +19,7 @@ public class GetCustomersQueryHandler : IRequestHandler<GetCustomersQuery, ApiRe
     public async Task<ApiResponse<List<CustomerDto>>> Handle(GetCustomersQuery req, CancellationToken ct)
     {
         var query = _db.Customers.Include(c => c.Users).Select(c => new CustomerDto {
+            Id = c.Id,
             Name = c.Name,
             Attention = c.Attention,
             Tel = c.Tel,
@@ -52,6 +53,6 @@ public class GetCustomersQueryHandler : IRequestHandler<GetCustomersQuery, ApiRe
             _ => query.OrderByDescending(c => c.CreatedAt)
         };
 
-        return await query.UsePaginate<CustomerDto, Models.Customers>(req.Page, req.PageSize, ct);
+        return await query.UsePaginate(req.Page, req.PageSize, ct);
     }
 }

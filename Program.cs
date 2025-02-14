@@ -3,6 +3,8 @@ using invoice_system.Utils.Configs;
 using invoice_system.Utils.Helpers;
 using Mapster;
 using invoice_system.Utils.Extensions;
+using invoice_system.Database;
+using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -10,7 +12,27 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.ConfigureSwagger();
 builder.Services.AddMapster();
-builder.Services.AddMediatR(config => {
+var connectionString = builder.Configuration.GetConnectionString("Database");
+builder.Services.AddDbContext<Db>(op =>
+{
+    op.UseNpgsql(connectionString);
+});
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            builder
+                .WithOrigins("http://localhost:3000")
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
+        });
+});
+
+builder.Services.AddMediatR(config =>
+{
     config.RegisterServicesFromAssembly(typeof(Program).Assembly);
 });
 builder.Services.AddJwtAuthentication(builder.Configuration);
@@ -30,10 +52,10 @@ if (app.Environment.IsDevelopment())
 app.UseStaticFiles();
 app.UseCors("AllowAll");
 app.UseHttpsRedirection();
+app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseCustomMiddleware();
-app.UseRouting();
 app.MapControllers();
 
 app.Run();

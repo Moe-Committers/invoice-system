@@ -1,5 +1,4 @@
 using invoice_system.Database;
-using invoice_system.Models;
 using invoice_system.Utils.DTOs.Authentication;
 using invoice_system.Utils.Helpers.ResHelpers;
 using invoice_system.Utils.Extensions;
@@ -18,7 +17,17 @@ public class GetUsersQueryHandler : IRequestHandler<GetUsersQuery, ApiResponse<L
 
     public async Task<ApiResponse<List<UserDto>>> Handle(GetUsersQuery request, CancellationToken ct)
     {
-        var query = _db.Users.AsQueryable();
+        var query = _db.Users.Select(u => new UserDto
+        {
+            Id = u.Id,
+            Name = u.Name,
+            Email = u.Email,
+            Age = u.Age,
+            Role = u.Role.Name,
+            Status = u.Status,
+            CreatedAt = u.CreatedAt,
+            Avatar = u.Avatar
+        }).AsQueryable();
 
         if (!string.IsNullOrEmpty(request.Search))
         {
@@ -42,7 +51,7 @@ public class GetUsersQueryHandler : IRequestHandler<GetUsersQuery, ApiResponse<L
             query = query.Where(u => u.CreatedAt <= request.ToDate);
         }
 
-        query = request.sort?.ToLower() switch
+        query = request.Sort?.ToLower() switch
         {
             "name" => request.IsAscending
                 ? query.OrderBy(u => u.Name)
@@ -56,6 +65,6 @@ public class GetUsersQueryHandler : IRequestHandler<GetUsersQuery, ApiResponse<L
             _ => query.OrderByDescending(u => u.CreatedAt)
         };
 
-        return await query.UsePaginate<UserDto, Users>(request.Page, request.PageSize , ct);
+        return await query.UsePaginate(request.Page, request.PageSize, ct);
     }
 }

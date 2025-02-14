@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using MediatR;
 
 namespace invoice_system.Features.Invoice.Commands.Create;
@@ -12,6 +13,7 @@ public record CreateInvoiceCommand : IRequest<Models.Invoices>
     public decimal DeliveryFee { get; set; }
     public decimal FinalPayment { get; set; }
     public long CustomerId { get; set; }
+    [JsonIgnore]
     public long UserId { get; set; }
     public List<InvoiceItemDto> Items { get; set; }
 }

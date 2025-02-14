@@ -20,7 +20,7 @@ public class UpdateProfileCommandHandler : IRequestHandler<UpdateProfileCommand,
 
     public async Task<UserDto> Handle(UpdateProfileCommand request, CancellationToken ct)
     {
-        var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == request.Id);
+        var user = await _db.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Id == request.Id);
         if (user == null)
         {
             throw new NotFoundExceptions("User not founded!");
@@ -36,7 +36,8 @@ public class UpdateProfileCommandHandler : IRequestHandler<UpdateProfileCommand,
         }
         user.UpdatedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync(ct);
-
-        return user.Adapt<UserDto>();
+        var userDto = user.Adapt<UserDto>();
+        userDto.Role = user.Role.Name;
+        return userDto;
     }
 }

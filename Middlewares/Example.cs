@@ -1,17 +1,21 @@
 namespace invoice_system.Middlewares;
 
-public class Example {
+public class Examplee
+{
     private readonly RequestDelegate _next;
-    private readonly ILogger<Example> _logger;
-    public Example(RequestDelegate next , ILogger<Example> logger){
+    private readonly ILogger<Examplee> _logger;
+    public Examplee(RequestDelegate next, ILogger<Examplee> logger)
+    {
         _next = next;
         _logger = logger;
     }
 
-    public async Task Invoke(HttpContext http){
-        if(http.Request.Path.StartsWithSegments("/api/example")){
+    public async Task InvokeAsync(HttpContext http)
+    {
+        if (http.Request.Path.StartsWithSegments("/api/example"))
+        {
             _logger.LogInformation("hellow form example middleware");
-        }   
-        await _next(http);     
+        }
+        await _next(http);
     }
 }

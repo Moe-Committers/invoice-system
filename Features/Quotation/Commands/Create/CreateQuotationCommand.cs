@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using MediatR;
 
 namespace invoice_system.Features.Quotation.Commands.Create;
@@ -12,6 +13,7 @@ public record CreateQuotationCommand : IRequest<Models.Quotations>
     public decimal DeliveryFee { get; set; }
     public decimal FinalAmount { get; set; }
     public long CustomerId { get; set; }
+    [JsonIgnore]
     public long UserId { get; set; }
     public List<QuotationItemDto> Items { get; set; }
 }

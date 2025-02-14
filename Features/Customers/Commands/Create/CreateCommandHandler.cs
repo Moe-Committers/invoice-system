@@ -1,11 +1,12 @@
 using invoice_system.Database;
 using invoice_system.Utils.Exceptions;
+using Mapster;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace invoice_system.Features.Customers.Commands.Create;
 
-public class CreateCommandHandler : IRequestHandler<CreateCommand, Models.Customers>
+public class CreateCommandHandler : IRequestHandler<CreateCommand, ActionCustomer>
 {
     private readonly Db _db;
     public CreateCommandHandler(Db db)
@@ -13,9 +14,9 @@ public class CreateCommandHandler : IRequestHandler<CreateCommand, Models.Custom
         _db = db;
     }
 
-    public async Task<Models.Customers> Handle(CreateCommand req, CancellationToken ct)
+    public async Task<ActionCustomer> Handle(CreateCommand req, CancellationToken ct)
     {
-        var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == req.UserId , ct);
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == req.UserId, ct);
 
         if (user == null)
         {
@@ -34,6 +35,6 @@ public class CreateCommandHandler : IRequestHandler<CreateCommand, Models.Custom
 
         await _db.SaveChangesAsync(ct);
 
-        return newCustomer;
+        return newCustomer.Adapt<ActionCustomer>();
     }
 }
